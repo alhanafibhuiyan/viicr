@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VII Cruiser Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="Logo1.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --light-green: #E8F5E9;
+            --dark-green: #2E7D32;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --gray: #9E9E9E;
+            --dark-gray: #424242;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            transition: all 0.3s ease;
+        }
+
+        /* Login Panel Styles */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color), var(--light-green));
+        }
+
+        .login-panel {
+            background-color: var(--white);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1rem;
+            border-radius: 50%;
+            background-color: var(--light-green);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .login-panel h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-panel h2 {
+            color: var(--gray);
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            font-weight: normal;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.2);
+        }
+
+        .input-group input::placeholder {
+            color: var(--gray);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-btn:hover {
+            background-color: var(--dark-green);
+        }
+
+        .error-message {
+            color: #f44336;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--light-green);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        /* Main Dashboard Styles */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 1rem;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .datetime {
+            font-size: 0.9rem;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--white);
+            height: calc(100vh - 60px);
+            position: fixed;
+            top: 60px;
+            left: 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            z-index: 90;
+        }
+
+        .sidebar-header {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            border-bottom: 1px solid #eee;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 1rem;
+            color: var(--dark-gray);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: var(--light-green);
+            color: var(--primary-color);
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 0.5rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            transition: margin 0.3s ease;
+        }
+
+        .welcome-message {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            animation: slideUp 0.5s ease;
+        }
+
+        .welcome-message h2 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-color: var(--light-green);
+            color: white;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        
+        }
+
+        .dashboard-card i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-card h3 {
+            margin-bottom: 0.5rem;
+            color: var(--dark-gray);
+        }
+
+        .dashboard-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Page Styles */
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-title {
+            color: var(--primary-color);
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: var(--dark-green);
+        }
+
+        .card {
+            background-color: var(--white);
+            padding: 1.5rem;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .class-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .info-item i {
+            margin-right: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .class-captains {
+            margin-top: 2rem;
+        }
+
+        .captain-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .captain-card {
+            background-color: var(--light-green);
+            padding: 1rem;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .captain-card i {
+            font-size: 2rem;
+            color: #28a745;
+            margin-bottom: 0.5rem;
+        }
+
+        .captain-card h4 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        tr:hover {
+            background-color: var(--light-green);
+        }
+
+        .search-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        /* Routine and Sit Plan Styles */
+        .image-container {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer Styles */
+        .footer {
+            background-color: var(--white);
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 2rem;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: auto;
+            position: relative;
+            padding: 1.5rem;
+        }
+
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 1rem;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .copyright {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 99;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background-color: var(--dark-green);
+        }
+
+        /* Success Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .class-info {
+                grid-template-columns: 1fr;
+            }
+
+            .captain-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-card {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes modalFadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Panel -->
+    <div class="login-container" id="login-container">
+        <div class="login-panel">
+            <div class="logo">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h1>VII Cruiser Dashboard</h1>
+            <h2>Admin Login Panel</h2>
+            <form id="login-form" class="login-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+            <div class="error-message" id="error-message">
+                Invalid username or password. Please try again.
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Animation -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <div class="loader-text">Loading ...</div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="header-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>Admin Dashboard</h1>
+            </div>
+            <!--<div class="datetime" id="datetime"></div>-->
+            <div class="menu-toggle" id="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </header>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <br>
+            <div class="sidebar-header">
+                <!--<div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>-->
+                <!--<div class="user-info">
+                    <span class="user-name" id="user-name"></span>
+                    <div class="user-avatar" id="user-avatar"></div>
+                </div>-->
+                <!--<div class="menu-toggle" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <h3>Admin Panel</h3>-->
+                <h3>Date & Time</h3>
+                <div id="sidebar-datetime"></div>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="nav-link" data-page="home"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="#" class="nav-link" data-page="class-info"><i class="fas fa-info-circle"></i> Class Information</a></li>
+                <li><a href="#" class="nav-link" data-page="student-list"><i class="fas fa-users"></i> Student List</a></li>
+                <li><a href="#" class="nav-link" data-page="teacher-list"><i class="fas fa-chalkboard-teacher"></i> Teacher List</a></li>
+                <li><a href="#" class="nav-link" data-page="class-routine"><i class="fas fa-calendar-alt"></i> Class Routine</a></li>
+                <li><a href="#" class="nav-link" data-page="sit-plan"><i class="fas fa-chair"></i> Sit Plan</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="main-content">
+            <!-- Home Page -->
+            <div class="page" id="home-page">
+                <div class="welcome-message">
+                    <h2>Welcome to Admin Panel</h2>
+                    <p>You can manage all class information from this dashboard.</p>
+                </div>
+
+                <div class="dashboard-cards">
+                    <div class="dashboard-card" data-page="class-info">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>Class Information</h3>
+                        <p>View class details and statistics</p>
+                    </div>
+                    <div class="dashboard-card" data-page="student-list">
+                        <i class="fas fa-users"></i>
+                        <h3>Student List</h3>
+                        <p>Manage all student information</p>
+                    </div>
+                    <div class="dashboard-card" data-page="teacher-list">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <h3>Teacher List</h3>
+                        <p>View all teacher information</p>
+                    </div>
+                    <div class="dashboard-card" data-page="class-routine">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Class Routine</h3>
+                        <p>View class schedule</p>
+                    </div>
+                    <div class="dashboard-card" data-page="sit-plan">
+                        <i class="fas fa-chair"></i>
+                        <h3>Sit Plan</h3>
+                        <p>View classroom seating arrangement</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Class Information Page -->
+            <div class="page" id="class-info-page">
+                <div class="page-header">
+                    <h2 class="page-title">Class Information</h2>
+                    <a href="#" class="back-btn" data-page="home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                </div>
+
+                <div class="card">
+                    <div class="class-info">
+                        <div>
+                            <div class="info-item">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <div>
+                                    <h4>Class Teacher</h4>
+                                    <p>Kamrunnahar</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-users"></i>
+                                <div>
+                                    <h4>Total Students</h4>
+                                    <p>51</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="info-item">
+                                <i class="fas fa-male"></i>
+                                <div>
+                                    <h4>Boys</h4>
+                                    <p>29</p>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <i class="fas fa-female"></i>
+                                <div>
+                                    <h4>Girls</h4>
+                                    <p>22</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card class-captains">
+                    <h3>Class Captains</h3>
+                    <div class="captain-grid">
+                        <div class="captain-card">
+                            <i class="fas fa-user"></i>
+                            <h4>Fahad</h4>
+                            <p>Boy Captain</p>
+                        </div>
+                        <div class="captain-card">
+                            <i class="fas fa-user"></i>
+                            <h4>Roshan</h4>
+                            <p>Boy Vice Captain</p>
+                        </div>
+                        <div class="captain-card">
+                            <i class="fas fa-user"></i>
+                            <h4>Humira</h4>
+                            <p>Girl Captain</p>
+                        </div>
+                        <div class="captain-card">
+                            <i class="fas fa-user"></i>
+                            <h4>Mridula</h4>
+                            <p>Girl Vice Captain</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student List Page -->
+            <div class="page" id="student-list-page">
+                <div class="page-header">
+                    <h2 class="page-title">Student List</h2>
+                    <a href="#" class="back-btn" data-page="home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                </div>
+
+                <div class="card">
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="student-search" placeholder="Search students...">
+                    </div>
+                    <div class="table-container">
+                        <table id="student-table">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Roll</th>
+                                    <th>Student ID</th>
+                                    <th>Bank ID</th>
+                                    <th>Name</th>
+                                    <th>Sex</th>
+                                    <th>Date of Birth</th>
+                                    <th>B.G</th>
+                                    <th>House</th>
+                                    <th>Father's Name</th>
+                                    <th>Father's Mobile</th>
+                                    <th>Mother's Name</th>
+                                    <th>Mother's Mobile</th>
+                                    <th>Host / SMS</th>
+                                    <th>What&#39;sApp Contact</th>
+                                    <th>Category</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>1007</td>
+                                    <td>20181359</td>
+                                    <td>210101146</td>
+                                    <td>AYESHA HUMAIRA</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>MD RAIHANUL ISLAM</td>
+                                    <td>+880 1716-260051</td>
+                                    <td>MST RASIDA MOUSUMI</td>
+                                    <td>+880 1712-401422</td>
+                                    <td>+880 1712-401422</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>1008</td>
+                                    <td>20181149</td>
+                                    <td>180100276</td>
+                                    <td>SHAHRIN SADIDA JUI</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MD. SHAH JALAL SARKER</td>
+                                    <td>+880 1678-726747</td>
+                                    <td>AYESHA AKTER</td>
+                                    <td>+880 1864-133917</td>
+                                    <td>+880 1864-133917</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>1017</td>
+                                    <td>20181398</td>
+                                    <td>220103330</td>
+                                    <td>MORIUM ZAMAN MRIDULA</td>
+                                    <td>Female</td>
+                                    <td>Monday, September 5, 2011</td>
+                                    <td>B⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MD MILLAT HOSSAIN</td>
+                                    <td>+880 1303-355457</td>
+                                    <td>AFROJA KHATUN</td>
+                                    <td>+880 1321-084575</td>
+                                    <td>+880 1321-084575</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>1021</td>
+                                    <td>20181305</td>
+                                    <td>200100300</td>
+                                    <td>TAJIBA ALAM</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Isha Kha</td>
+                                    <td>SHAH ALAM</td>
+                                    <td>+880 1721-237107</td>
+                                    <td>SYEDA TANBINA</td>
+                                    <td>+880 1752-364084</td>
+                                    <td>+880 1752-364084</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td>1030</td>
+                                    <td>20181009</td>
+                                    <td>180100705</td>
+                                    <td>ROSHAN ASFAR</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MD ABDUL KADER</td>
+                                    <td>+880 1944-527888</td>
+                                    <td>RUMANA FEDOUSI</td>
+                                    <td>+880 1552-304061</td>
+                                    <td>+880 1944-527888</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td>1033</td>
+                                    <td>20181377</td>
+                                    <td>220102603</td>
+                                    <td>RAKIN SAFIR</td>
+                                    <td>Male</td>
+                                    <td>Thursday, August 30, 2012</td>
+                                    <td>B⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MD. SHAHNAWAZ KASHEM</td>
+                                    <td>+880 1912-512090</td>
+                                    <td>MST. RAKIBA PARVEN</td>
+                                    <td>+880 1814-221440</td>
+                                    <td>+880 1912-512090</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td>1042</td>
+                                    <td>20181138</td>
+                                    <td>190100649</td>
+                                    <td>MAHZABIN MRIDULA</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>MD. FAZLUR RAHMAN</td>
+                                    <td>+880 1710-497532</td>
+                                    <td>NUR NAHAR BEGUM</td>
+                                    <td>+880 1755-439590</td>
+                                    <td>+880 1710-497532</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td>1051</td>
+                                    <td>20181100</td>
+                                    <td>180100274</td>
+                                    <td>ABDULLAH AL TOWSIF</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>MD. YOUSUF</td>
+                                    <td>+880 1874-583963</td>
+                                    <td>MRS. SHAZEDA PARVIN</td>
+                                    <td>+880 1824-688665</td>
+                                    <td>+880 1824-688665</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>9</td>
+                                    <td>1058</td>
+                                    <td>20181146</td>
+                                    <td>170100443</td>
+                                    <td>TAZKIN TABASSUM</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>O⁺</td>
+                                    <td>Isha Kha</td>
+                                    <td>MD. MIJANUR RAHMAN KHAN</td>
+                                    <td>+880 1711-107111</td>
+                                    <td>SAMMI SULTANA</td>
+                                    <td>+880 1717-831446</td>
+                                    <td>+880 1711-107111</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>10</td>
+                                    <td>1060</td>
+                                    <td>20181391</td>
+                                    <td>220103016</td>
+                                    <td>S M FARHAN SADIK</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>Isha Kha</td>
+                                    <td>ABDUS SAMAD SHEIKH</td>
+                                    <td></td>
+                                    <td>AFROZA KHANAM</td>
+                                    <td></td>
+                                    <td>+880 1728-207039</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>11</td>
+                                    <td>1067</td>
+                                    <td>20181245</td>
+                                    <td>180100681</td>
+                                    <td>NAFASAT RAFAN</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>MUHAMMED SHOHAN HAFIZ SHAH</td>
+                                    <td>+880 1765-792569</td>
+                                    <td>NADIRA AFROZ</td>
+                                    <td>+880 1908-653269</td>
+                                    <td>+880 1765-792569</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>12</td>
+                                    <td>1074</td>
+                                    <td>20181200</td>
+                                    <td>180100195</td>
+                                    <td>MATRI BINTE MIZAN, FFS</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>Late WO ASM MIZANUR RAHMAN</td>
+                                    <td>+880 1825-397477</td>
+                                    <td>Sumi Akter</td>
+                                    <td>+880 1725-493509</td>
+                                    <td>+880 1825-397477</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>13</td>
+                                    <td>1080</td>
+                                    <td>20181122</td>
+                                    <td>180100154</td>
+                                    <td>MAISHARA MALIHA</td>
+                                    <td>Female</td>
+                                    <td>Tuesday, October 4, 2011</td>
+                                    <td>B⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MAHMUDUL HASAN</td>
+                                    <td>+880 1904-642550</td>
+                                    <td>ROZINA AKTER</td>
+                                    <td>+880 1799-879147</td>
+                                    <td>+880 1799-879147</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>14</td>
+                                    <td>1081</td>
+                                    <td>20181370</td>
+                                    <td>220102540</td>
+                                    <td>TASFIA MIZAN NEDHI</td>
+                                    <td>Female</td>
+                                    <td>Tuesday, January 10, 2012</td>
+                                    <td>B⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MD. MIZANUR RAHMAN</td>
+                                    <td>+880 1938-368923</td>
+                                    <td>SHALINA AKTER SHUKHI</td>
+                                    <td>+880 1726-262637</td>
+                                    <td>+880 1938-368923</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>15</td>
+                                    <td>1088</td>
+                                    <td>20181415</td>
+                                    <td>230103083</td>
+                                    <td>NABIHA NAZNEEN TOHA</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MD NOMANUL HOQ</td>
+                                    <td>+880 1678-734281</td>
+                                    <td>FARJANA AKTER SIDDIKA</td>
+                                    <td>+880 1766-450188</td>
+                                    <td>+880 1678-734281</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>16</td>
+                                    <td>1095</td>
+                                    <td>20181250</td>
+                                    <td>180100269</td>
+                                    <td>MOHAMMAD LAFIF NASIR</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MD. NASIR UDDIN</td>
+                                    <td>+880 1970-099700</td>
+                                    <td>AFROJA AKHTER</td>
+                                    <td>+880 1677-814346</td>
+                                    <td>+880 1726-353775</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>17</td>
+                                    <td>1102</td>
+                                    <td>20181108</td>
+                                    <td>190100375</td>
+                                    <td>SYED IRFAN SAQIR</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>SYED MAHBOOB ISHTIAQUE AHMAD</td>
+                                    <td>+880 1711-700671</td>
+                                    <td>FARJANA SHARMIN</td>
+                                    <td>+880 1711-382467</td>
+                                    <td>+880 1711-382467</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>18</td>
+                                    <td>1113</td>
+                                    <td>20181164</td>
+                                    <td>180100168</td>
+                                    <td>HUMAIRA ISLAM NISA</td>
+                                    <td>Female</td>
+                                    <td>Monday, May 14, 2012</td>
+                                    <td>A⁺</td>
+                                    <td>Isha Kha</td>
+                                    <td>SHAH MD. SHAHINUR ISLAM</td>
+                                    <td>+880 1710-895935</td>
+                                    <td>HASNE ARA BEGUM</td>
+                                    <td>+880 1677-814346</td>
+                                    <td>+880 1677-814346</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>19</td>
+                                    <td>1116</td>
+                                    <td>20181323</td>
+                                    <td>210100447</td>
+                                    <td>HASNAIN SHAHARIAR SHUVO</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>MOHAMMAD HUMAYUN KABIR</td>
+                                    <td>+880 1755-596370</td>
+                                    <td>HAZERA BEGUM</td>
+                                    <td>+880 1711-732691</td>
+                                    <td>+880 1755-596370</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>20</td>
+                                    <td>1123</td>
+                                    <td>20181421</td>
+                                    <td>230103419</td>
+                                    <td>SALEM SAFWAN</td>
+                                    <td>Male</td>
+                                    <td>Wednesday, November 2, 2011</td>
+                                    <td>A⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>SAIFUL ISLAM</td>
+                                    <td>+880 1678-601307</td>
+                                    <td>FATEMA TUZ ZOHORA</td>
+                                    <td>+880 1724-524527</td>
+                                    <td>+880 1678-601307</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>21</td>
+                                    <td>1128</td>
+                                    <td>20181047</td>
+                                    <td>180100172</td>
+                                    <td>NANDINI RAHMAN</td>
+                                    <td>Female</td>
+                                    <td>Wednesday, December 19, 2012</td>
+                                    <td>O⁺</td>
+                                    <td>Titumir</td>
+                                    <td>KAZI MIJANUR RAHMAN</td>
+                                    <td>+880 1714-161281</td>
+                                    <td>LIPI AKTER</td>
+                                    <td>+880 1715-146228</td>
+                                    <td>+880 1715-146228</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>22</td>
+                                    <td>1133</td>
+                                    <td>20181040</td>
+                                    <td>180100228</td>
+                                    <td>YASIF MOHAMMAD</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>O⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>YARE MOHAMMAD</td>
+                                    <td>+880 1912-912820</td>
+                                    <td>FATEMA BEGUM</td>
+                                    <td>+880 1918-906160</td>
+                                    <td>+880 1918-906160</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>23</td>
+                                    <td>1139</td>
+                                    <td>20181011</td>
+                                    <td>180100348</td>
+                                    <td>NAJMUS SAKIB SAAD</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>O⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MD. MAHABUB UL HASAN</td>
+                                    <td>+880 1727-320269</td>
+                                    <td>MOST SHAHNAJ SULTANA</td>
+                                    <td>+880 1718-749209</td>
+                                    <td>+880 1718-749209</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>24</td>
+                                    <td>1144</td>
+                                    <td>20181144</td>
+                                    <td>180100176</td>
+                                    <td>SAMIRA ANJUMAN</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>O⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>MOHAMMAD KAMRUJJAMAN</td>
+                                    <td>+880 1708-308201</td>
+                                    <td>SAMIMA AKTER</td>
+                                    <td>+880 1821-861591</td>
+                                    <td>+880 1821-861591</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>25</td>
+                                    <td>1149</td>
+                                    <td>20181114</td>
+                                    <td>180100263</td>
+                                    <td>ABU SADAT MD. GOLAM KIBRIYA</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>ABU TAHER MD. REZAUL KARIM</td>
+                                    <td>+880 1923-049604</td>
+                                    <td>SHAMIMA AKTER SHAMMI</td>
+                                    <td>+880 1961-857007</td>
+                                    <td>+880 1961-857007</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>26</td>
+                                    <td>1159</td>
+                                    <td>20181203</td>
+                                    <td>180100275</td>
+                                    <td>RAYAN ZABIR REESHAN</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>FAISAL AHMED </td>
+                                    <td>+880 1611-001444</td>
+                                    <td>DILARA AKTER</td>
+                                    <td>+880 1673-319558</td>
+                                    <td>+880 1673-319558</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>27</td>
+                                    <td>1164</td>
+                                    <td>20181342</td>
+                                    <td>210100861</td>
+                                    <td>NUSRAT FARIA ALI</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>MD. RATTAN ALI</td>
+                                    <td>+880 1741-001423</td>
+                                    <td>SHARMIN AKTER</td>
+                                    <td>+880 1758-444123</td>
+                                    <td>+880 1758-444123</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>28</td>
+                                    <td>1170</td>
+                                    <td>20181021</td>
+                                    <td>180100185</td>
+                                    <td>FAHAD AL HASAN</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>MD. MEHEDI HASAN</td>
+                                    <td>+880 1977-369383</td>
+                                    <td>MOST. FARHANA KHATUN</td>
+                                    <td>+880 1791-300256</td>
+                                    <td>+880 1977-369383</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>29</td>
+                                    <td>1178</td>
+                                    <td>20181160</td>
+                                    <td>190100407</td>
+                                    <td>SHAYAN ALAM ZAYAN</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>AB⁻</td>
+                                    <td>Nazrul</td>
+                                    <td>SURFUL ALAM JIHAN</td>
+                                    <td>+880 1309-247866</td>
+                                    <td>MASUDA KHANAM</td>
+                                    <td>+880 1712-490887</td>
+                                    <td>+880 1712-490887</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>30</td>
+                                    <td>1184</td>
+                                    <td>20181153</td>
+                                    <td>180100422</td>
+                                    <td>ADEENA ASRA ISLAM</td>
+                                    <td>Female</td>
+                                    <td>Thursday, October 11, 2012</td>
+                                    <td>O⁺</td>
+                                    <td>Titumir</td>
+                                    <td>DIL UZAYER ISLAM</td>
+                                    <td>+880 1711-507204</td>
+                                    <td>ALEYA FERDOUS</td>
+                                    <td>+880 1746-606060</td>
+                                    <td>+880 1746-606060</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>31</td>
+                                    <td>1188</td>
+                                    <td>20181235</td>
+                                    <td>180100456</td>
+                                    <td>AKBOR HOSSAIN OVI</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>MD. AZAD HOSSAIN</td>
+                                    <td></td>
+                                    <td>MST. SALMA</td>
+                                    <td></td>
+                                    <td>+880 1727-636077</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>32</td>
+                                    <td>1198</td>
+                                    <td>20181285</td>
+                                    <td>170100537</td>
+                                    <td>SAHARIAR RUKSHAD SHEHAN</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>MD. SIRAJUL ISLAM</td>
+                                    <td></td>
+                                    <td>ABIDA SULTANA NAJNIN</td>
+                                    <td></td>
+                                    <td>+880 1749-069263</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>33</td>
+                                    <td>1203</td>
+                                    <td>20181166</td>
+                                    <td>190100214</td>
+                                    <td>JAIYANA ABEDIN</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>MD JOYNAL ABEDIN</td>
+                                    <td>+880 1708-375341</td>
+                                    <td>NASIMA AKTER</td>
+                                    <td>+880 1708-375342</td>
+                                    <td>+880 1708-375341</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>34</td>
+                                    <td>1207</td>
+                                    <td>20181090</td>
+                                    <td>180100662</td>
+                                    <td>MIRAZ AJWAF SINDID</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>MIRAZ FARHAT ANJUM, SALMAN PARVEZ</td>
+                                    <td></td>
+                                    <td>MUNIRA MUSTARIN LIZA</td>
+                                    <td></td>
+                                    <td>+880 1951-809999</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>35</td>
+                                    <td>1213</td>
+                                    <td>20181400</td>
+                                    <td>220103356</td>
+                                    <td>SAMIRA AKTER</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>MD ABU SAYED</td>
+                                    <td></td>
+                                    <td>NAZMA AKTER</td>
+                                    <td></td>
+                                    <td>+880 1636-538094</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>36</td>
+                                    <td>1217</td>
+                                    <td>20181204</td>
+                                    <td>180100218</td>
+                                    <td>MD. ALVEE RAHMAN SAFAYET</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>MD. SAHIDUL ISLAM</td>
+                                    <td>+880 1817-609673</td>
+                                    <td>AFROJA AKTER LIPE</td>
+                                    <td>+880 1936-300674</td>
+                                    <td>+880 1936-300674</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>37</td>
+                                    <td>1225</td>
+                                    <td>20181228</td>
+                                    <td>180100297</td>
+                                    <td>AHNAF NABI ARIK</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>A⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>MAHMUDUN NABI URAD</td>
+                                    <td>+880 1715-137621</td>
+                                    <td>SHAHNAZ PERVIN</td>
+                                    <td>+880 1712-038043</td>
+                                    <td>+880 1712-038043</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>38</td>
+                                    <td>1233</td>
+                                    <td>20181324</td>
+                                    <td>210100449</td>
+                                    <td>RABEYA BOSRI</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>Isha Kha</td>
+                                    <td>MD JUWEL RANA</td>
+                                    <td></td>
+                                    <td>MST SADIA SULTANA</td>
+                                    <td></td>
+                                    <td>+880 1726-720440</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>39</td>
+                                    <td>1235</td>
+                                    <td>20183101</td>
+                                    <td>240101686</td>
+                                    <td>AYMAN ZARIF AUBHRO</td>
+                                    <td>Male</td>
+                                    <td>Monday, August 27, 2012</td>
+                                    <td>B⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>DR. TONMOY JAMSHED ALAM</td>
+                                    <td></td>
+                                    <td>DR. GULSHAN ARA KOHINOOR</td>
+                                    <td></td>
+                                    <td>+880 1715-457579</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>40</td>
+                                    <td>1243</td>
+                                    <td>20181211</td>
+                                    <td>180100293</td>
+                                    <td>ABIR HASSAN</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>MD. ALI HASSAN</td>
+                                    <td>+880 1865-432228</td>
+                                    <td>ASMA AKTAR ZAHAN</td>
+                                    <td>+880 1559-025030</td>
+                                    <td>+880 1787-946893</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>41</td>
+                                    <td>1250</td>
+                                    <td>20181256</td>
+                                    <td>180100642</td>
+                                    <td>TAWHID HOSSAIN PATWARY</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>AB⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>AHMED HOSSAIN PATWARY</td>
+                                    <td>+880 1911-367671</td>
+                                    <td>UMMA JOHURA</td>
+                                    <td>+880 1758-291447</td>
+                                    <td>+880 1911-367671</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>42</td>
+                                    <td>1256</td>
+                                    <td>20181158</td>
+                                    <td>190100446</td>
+                                    <td>JANNAT ISLAM</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Isha Kha</td>
+                                    <td>MD RAFIQUL ISLAM SHIPLU</td>
+                                    <td>+880 1610-003690</td>
+                                    <td>SHARMIN 1</td>
+                                    <td>+880 1983-711885</td>
+                                    <td>+880 1610-003690</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>43</td>
+                                    <td>1261</td>
+                                    <td>20181171</td>
+                                    <td>180100285</td>
+                                    <td>MD. MAHDEE KABIR</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Isha Kha</td>
+                                    <td>MD. HUMAYUN KABIR</td>
+                                    <td>+880 1726-344397</td>
+                                    <td>MAKSUDA KABIR</td>
+                                    <td>+880 1782-555053</td>
+                                    <td>+880 1782-555053</td>
+                                    <td></td>
+                                    <td>TSD</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>44</td>
+                                    <td>1266</td>
+                                    <td>20181298</td>
+                                    <td>180100287</td>
+                                    <td>MAHMUDUL HASAN FARID</td>
+                                    <td>Male</td>
+                                    <td>Sunday, November 25, 2012</td>
+                                    <td>O⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MD. SALAH UDDIN</td>
+                                    <td>+880 1728-055265</td>
+                                    <td>MST. FATEMA KHATUN</td>
+                                    <td>+880 1775-203751</td>
+                                    <td>+880 1728-055265</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>45</td>
+                                    <td>1283</td>
+                                    <td>20171255</td>
+                                    <td>170100620</td>
+                                    <td>SAFA ISLAM SINTHIA</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>Titumir</td>
+                                    <td>MD. SAIFUL ISLAM</td>
+                                    <td>+880 1735-887455</td>
+                                    <td>SWEET AKTER</td>
+                                    <td>+880 1720-532044</td>
+                                    <td>+880 1735-887455</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>46</td>
+                                    <td>1285</td>
+                                    <td>20181175</td>
+                                    <td>180100315</td>
+                                    <td>MOHAMMAD RAFIN</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>AB⁺</td>
+                                    <td>Titumir</td>
+                                    <td>Late MD. ERSHAD ULLAH</td>
+                                    <td></td>
+                                    <td>REBAKA SULTANA</td>
+                                    <td></td>
+                                    <td>+880 1816-255174</td>
+                                    <td></td>
+                                    <td>SD Staf</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>47</td>
+                                    <td>1290</td>
+                                    <td>20181402</td>
+                                    <td>220103366</td>
+                                    <td>AZFAR AZEEM EHAN</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td>Titumir</td>
+                                    <td>ISTIAQUE AHAMMAD</td>
+                                    <td>+880 1732-282223</td>
+                                    <td>ASMAUL HOSNA LIZA</td>
+                                    <td>+880 1715-780770</td>
+                                    <td>+880 1715-780770</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>48</td>
+                                    <td>1297</td>
+                                    <td>20181345</td>
+                                    <td>210100877</td>
+                                    <td>ZANNATUL ALAM ZARA</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>B⁺</td>
+                                    <td></td>
+                                    <td>ZAHANGIR ALAM</td>
+                                    <td>+880 1676-744422</td>
+                                    <td>MARZIA AKTER MUNNI</td>
+                                    <td>+880 177-745510</td>
+                                    <td>+880 1676-744422</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>49</td>
+                                    <td>1307</td>
+                                    <td>20181407</td>
+                                    <td>230100570</td>
+                                    <td>RAFSAN SIRAJ SANIM</td>
+                                    <td>Male</td>
+                                    <td></td>
+                                    <td>AB⁺</td>
+                                    <td>Nazrul</td>
+                                    <td>SIRAJUL ISLAM</td>
+                                    <td></td>
+                                    <td>NARGIS AKTER RUMI</td>
+                                    <td></td>
+                                    <td>+880 1756-701232</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>50</td>
+                                    <td>1310</td>
+                                    <td>20181360</td>
+                                    <td>210101149</td>
+                                    <td>MOHAMMADULLAH AL HANAFI BHUIYAN</td>
+                                    <td>Male</td>
+                                    <td>Monday, April 18, 2011</td>
+                                    <td>A⁺</td>
+                                    <td>Titumir</td>
+                                    <td>MD. RUBEL BHUIYAN</td>
+                                    <td>+880 1678-046876</td>
+                                    <td>MST SHAPLA AKTER</td>
+                                    <td>+880 1624-506178</td>
+                                    <td>+880 1678-046876</td>
+                                    <td></td>
+                                    <td>BAF</td>
+                                    <td>View</td>
+                                </tr>
+                                <tr>
+                                    <td>51</td>
+                                    <td>1312</td>
+                                    <td>20181308</td>
+                                    <td>200100328</td>
+                                    <td>SADIA RAHΜΑΝ</td>
+                                    <td>Female</td>
+                                    <td></td>
+                                    <td>O⁺</td>
+                                    <td>She-re-Bangla</td>
+                                    <td>MD SAYED-UR-RAHMAN</td>
+                                    <td></td>
+                                    <td>RUKSANA PARVIN</td>
+                                    <td></td>
+                                    <td>+880 1753-665617</td>
+                                    <td></td>
+                                    <td>Civil</td>
+                                    <td>View</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher List Page -->
+            <div class="page" id="teacher-list-page">
+                <div class="page-header">
+                    <h2 class="page-title">Teacher List</h2>
+                    <a href="#" class="back-btn" data-page="home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                </div>
+
+                <div class="card">
+                    <div class="search-container">
+                        <input type="text" class="search-input" id="teacher-search" placeholder="Search teachers...">
+                    </div>
+                    <div class="table-container">
+                        <table id="teacher-table">
+                            <thead>
+                                <tr>
+                                    <th>SL</th>
+                                    <th>Teacher ID</th>
+                                    <th>Name</th>
+                                    <th>Subject</th>
+                                    <th>Contact</th>
+                                    <th>E-mail</th>
+                                    <th>Designation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td></td>
+                                    <td>Kamrun Nahar</td>
+                                    <td>Bangla 1st Paper</td>
+                                    <td>+880 1716-040468</td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td></td>
+                                    <td>Mita Kabir</td>
+                                    <td>Bangla 2nd Paper</td>
+                                    <td></td>
+                                    <td>mitakabir146@gmail.com</td>
+                                    <td>Senior Teacher</td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>English 1st Paper</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td></td>
+                                    <td>Anamika Hazra</td>
+                                    <td>English 2nd Paper</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>5</td>
+                                    <td></td>
+                                    <td>Abu Bakr Siddique Khan</td>
+                                    <td>Math</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>6</td>
+                                    <td></td>
+                                    <td>Begum Rokeya</td>
+                                    <td>Science</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td></td>
+                                    <td>Aysha Khatun</td>
+                                    <td>Bangladesh &amp; Global Studies</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td></td>
+                                    <td>MD Johirul Islam</td>
+                                    <td>Information and Communication Technology</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>9</td>
+                                    <td>3200906  </td>
+                                    <td>Sharif Ahmed</td>
+                                    <td>Religion</td>
+                                    <td></td>
+                                    <td>abma3823@gmail.com</td>
+                                    <td>Senior Teacher</td>
+                                </tr>
+                                <tr>
+                                    <td>10</td>
+                                    <td></td>
+                                    <td>MD Kamruzzaman</td>
+                                    <td>Physical Education &amp; Health</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>11</td>
+                                    <td></td>
+                                    <td>A H M Tanvir Alom</td>
+                                    <td>Work and life-oriented education</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>12</td>
+                                    <td></td>
+                                    <td>Razia Sultana Ratna </td>
+                                    <td>Agricultural</td>
+                                    <td></td>
+                                    <td>ratnarahid03@gmail.com   </td>
+                                    <td>Senior Teacher</td>
+                                </tr>
+                                <tr>
+                                    <td>13</td>
+                                    <td></td>
+                                    <td>Kaniz Fatima Zeba</td>
+                                    <td>Home Science</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>14</td>
+                                    <td></td>
+                                    <td>Amina Afroz</td>
+                                    <td>Arts and Crafts</td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Class Routine Page -->
+            <div class="page" id="class-routine-page">
+                <div class="page-header">
+                    <h2 class="page-title">Class Routine</h2>
+                    <a href="#" class="back-btn" data-page="home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                </div>
+
+                <div class="card">
+                    <div class="image-container">
+                        <img src="cr.jpg" alt="Class Routine">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sit Plan Page -->
+            <div class="page" id="sit-plan-page">
+                <div class="page-header">
+                    <h2 class="page-title">Sit Plan</h2>
+                    <a href="#" class="back-btn" data-page="home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                </div>
+
+                <div class="card">
+                    <div class="image-container">
+                        <img src="sp.jpg" alt="Sit Plan">
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <button class="logout-btn" id="logout-btn">Log Out</button>
+            <p class="copyright">&copy; 2025 VII Cruiser Dashboard. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Back to Top Button -->
+    <div class="back-to-top" id="back-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="success-modal">
+        <div class="modal-content">
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Log Out Successful</h2>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginContainer = document.getElementById('login-container');
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+        const loading = document.getElementById('loading');
+        const dashboard = document.getElementById('dashboard');
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const backToTop = document.getElementById('back-to-top');
+        const logoutBtn = document.getElementById('logout-btn');
+        const successModal = document.getElementById('success-modal');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const dashboardCards = document.querySelectorAll('.dashboard-card');
+        //const pages = document.querySelectorAll('.page');
+        const studentSearch = document.getElementById('student-search');
+        const teacherSearch = document.getElementById('teacher-search');
+        const studentTable = document.getElementById('student-table');
+        const teacherTable = document.getElementById('teacher-table');
+
+        // Valid credentials
+        const validCredentials = [
+            { username: 'admin', password: '1234', name: 'Admin 1' },
+            { username: 'admin2', password: '0987', name: 'Admin 2' },
+            { username: 'admin3', password: '5678', name: 'Admin 3' }
+        ];
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            const dateTimeStr = now.toLocaleDateString('en-US', options);
+            
+            const datetimeElements = document.querySelectorAll('.datetime, #sidebar-datetime');
+            datetimeElements.forEach(el => {
+                el.textContent = dateTimeStr;
+            });
+        }
+
+        // Page Navigation
+        const menuItems = document.querySelectorAll('.menu-item, .dropdown-item, .dashboard-btn, .more-info, .back-btn, .quick-link');
+        const pages = document.querySelectorAll('.page');
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.getElementById('class-info-dropdown');
+
+        menuItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const pageId = this.getAttribute('data-page') + '-page';
+                
+                // Handle dropdown toggle
+                if (this.classList.contains('dropdown-toggle')) {
+                    dropdownMenu.classList.toggle('show');
+                    const arrow = this.querySelector('.dropdown-arrow');
+                    arrow.classList.toggle('fa-chevron-down');
+                    arrow.classList.toggle('fa-chevron-up');
+                    return;
+                }
+
+                // Close dropdown if clicking elsewhere
+                if (!this.classList.contains('dropdown-item')) {
+                    dropdownMenu.classList.remove('show');
+                    const arrow = dropdownToggle.querySelector('.dropdown-arrow');
+                    arrow.classList.remove('fa-chevron-up');
+                    arrow.classList.add('fa-chevron-down');
+                }
+
+                showPage(pageId);
+                
+                // Update active menu item
+                document.querySelectorAll('.menu-item').forEach(menuItem => {
+                    menuItem.classList.remove('active');
+                });
+                
+                if (this.classList.contains('menu-item') && !this.classList.contains('dropdown-toggle')) {
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            const activePage = document.getElementById(pageId);
+            if (activePage) {
+                activePage.style.display = 'block';
+            }
+        }
+
+        // Show loading animation
+        function showLoading() {
+            loading.style.display = 'flex';
+        }
+
+        // Hide loading animation
+        function hideLoading() {
+            loading.style.display = 'none';
+        }
+
+        // Show page
+        function showPage(pageId) {
+            pages.forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById(pageId).style.display = 'block';
+        }
+
+        // Login form submission
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Validate credentials
+            const isValid = validCredentials.some(cred => 
+                cred.username === username && cred.password === password
+            );
+            
+            if (isValid) {
+                errorMessage.style.display = 'none';
+                showLoading();
+                
+                // Simulate loading delay
+                setTimeout(() => {
+                    hideLoading();
+                    loginContainer.style.display = 'none';
+                    dashboard.style.display = 'block';
+                    showPage('home-page');
+                }, 1500);
+            } else {
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        // Menu toggle for mobile
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+
+        // Navigation links
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const page = this.getAttribute('data-page');
+                showPage(`${page}-page`);
+                
+                // Close sidebar on mobile
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Dashboard cards
+        dashboardCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const page = this.getAttribute('data-page');
+                showPage(`${page}-page`);
+            });
+        });
+
+        // Back to top button
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Logout button
+        logoutBtn.addEventListener('click', function() {
+            successModal.style.display = 'flex';
+            
+            setTimeout(() => {
+                showLoading();
+                
+                // Simulate loading delay
+                setTimeout(() => {
+                    hideLoading();
+                    successModal.style.display = 'none';
+                    dashboard.style.display = 'none';
+                    loginContainer.style.display = 'flex';
+                    loginForm.reset();
+                    showPage('home-page');
+                    
+                    // Reset to home page for next login
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('active');
+                    }
+                }, 1000);
+            }, 1500);
+        });
+
+        // Student search functionality
+        studentSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = studentTable.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Teacher search functionality
+        teacherSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = teacherTable.querySelectorAll('tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Initialize
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>
